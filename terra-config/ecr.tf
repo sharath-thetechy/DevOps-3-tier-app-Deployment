@@ -1,8 +1,11 @@
-resource "aws_ecrpublic_repository" "frontend" {
-  repository_name  = "three-tier-frontend"
+provider "aws" {
+  region = "ap-south-1"
 }
 
-resource "aws_ecrpublic_repository" "backend" {
-  repository_name  = "three-tier-backend"
-  
+resource "aws_ecr_repository" "frontend" {
+  name = "frontend"
+}
+
+resource "aws_ecr_repository" "backend" {
+  name = "backend"
 }
