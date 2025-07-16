@@ -7,8 +7,14 @@ WORKDIR /usr/src/app
 # Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
 
-# Install the application's dependencies inside the container
-RUN npm install
+# Optional: Add a custom .npmrc to improve registry access
+COPY .npmrc .npmrc
+
+# Force DNS resolution to use Google DNS
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+# Add a short delay to ensure network stack is ready
+RUN sleep 5 && npm install
 
 # Copy the rest of the application code to the container
 COPY . .
