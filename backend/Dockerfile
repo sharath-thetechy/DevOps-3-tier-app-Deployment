@@ -1,5 +1,5 @@
 # Use a stable Debian-based Node image
-FROM node:14-slim
+FROM node:18-slim
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
