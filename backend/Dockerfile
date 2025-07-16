@@ -1,16 +1,16 @@
-# Use the official Node.js 14 image as a base image
+# Use a stable Debian-based Node image
 FROM node:14-slim
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy package files first to leverage Docker cache
 COPY package*.json ./
 
 # Optional: Add a custom .npmrc to improve registry access
 COPY .npmrc .npmrc
 
-# Configure npm to improve reliability and avoid SSL/DNS issues
+# Configure npm for reliability
 RUN npm config set registry https://registry.npmjs.org/ \
     && npm config set strict-ssl false \
     && npm config set fetch-retries 5 \
@@ -20,8 +20,8 @@ RUN npm config set registry https://registry.npmjs.org/ \
 # Force DNS resolution to use Google DNS
 RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
 
-# Add a short delay to ensure network stack is ready
-RUN sleep 5 && npm install --force --loglevel verbose
+# Use npm ci instead of install (faster and cleaner)
+RUN npm ci --force --loglevel verbose
 
 # Copy the rest of the application code to the container
 COPY . .
