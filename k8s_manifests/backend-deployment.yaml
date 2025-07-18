@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
+  namespace: workshop
   labels:
     role: backend
+    env: demo
 spec:
   replicas: 1
   strategy:
@@ -20,23 +22,34 @@ spec:
         role: backend
     spec:
       containers:
-        - name: backend
-          image: 017820665694.dkr.ecr.ap-south-1.amazonaws.com/backend:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 5
-      imagePullSecrets:
-        - name: ecr-secret
+      - name: backend
+        image: public.ecr.aws/e0s8n6f1/three-tier-backend:latest
+        imagePullPolicy: Always
+        env:
+          - name: MONGO_CONN_STR
+            value: mongodb://mongodb-svc:27017/todo?directConnection=true
+          - name: MONGO_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongo-sec
+                key: username
+          - name: MONGO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongo-sec
+                key: password
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /ok
+            port: 8080
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+             path: /ok
+             port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
