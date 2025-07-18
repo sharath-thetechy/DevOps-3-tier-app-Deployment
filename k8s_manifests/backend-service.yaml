@@ -1,13 +1,13 @@
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: frontend
   namespace: workshop
 spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-  type: ClusterIP
+  type: NodePort
   selector:
-   role: backend
+    app: frontend
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 32000  # optional, or let Kubernetes assign
